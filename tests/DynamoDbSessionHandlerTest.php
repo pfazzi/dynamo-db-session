@@ -42,6 +42,13 @@ class DynamoDbSessionHandlerTest extends TestCase
         self::assertEquals('test', $this->instance->read('test456'));
     }
 
+    public function test_rewrite_and_read()
+    {
+        self::assertTrue($this->instance->write('test456', 'test'));
+        self::assertTrue($this->instance->write('test456', 'test test'));
+        self::assertEquals('test test', $this->instance->read('test456'));
+    }
+
     public function test_destroy()
     {
         $this->instance->write('test456', 'test');
