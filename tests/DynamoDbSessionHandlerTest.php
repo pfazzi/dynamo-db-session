@@ -42,7 +42,7 @@ class DynamoDbSessionHandlerTest extends TestCase
         self::assertEquals('test', $this->instance->read('test456'));
     }
 
-    public function testDoDestroy()
+    public function test_destroy()
     {
         $this->instance->write('test456', 'test');
         $this->instance->destroy('test456');
