@@ -1,11 +1,19 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Pfazzi\Session\DynamoDb;
 
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Marshaler;
+use LogicException;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
+
+use function gettype;
+use function is_array;
+use function is_string;
+use function sprintf;
 
 class DynamoDbSessionHandler extends AbstractSessionHandler
 {
@@ -15,7 +23,7 @@ class DynamoDbSessionHandler extends AbstractSessionHandler
 
     public function __construct(DynamoDbClient $dynamodb, string $tableName)
     {
-        $this->dynamodb = $dynamodb;
+        $this->dynamodb  = $dynamodb;
         $this->tableName = $tableName;
 
         $this->marshaler = new Marshaler();
@@ -36,33 +44,31 @@ class DynamoDbSessionHandler extends AbstractSessionHandler
 
     protected function doRead(string $sessionId): string
     {
-        $key = $this->marshaler->marshalItem([
-            'id' => $sessionId
-        ]);
+        $key = $this->marshaler->marshalItem(['id' => $sessionId]);
 
         $result = $this->dynamodb->getItem([
             'TableName' => $this->tableName,
-            'Key' => $key
+            'Key' => $key,
         ]);
 
-        $item = $result["Item"] ?? null;
-        if (null === $item) {
+        $item = $result['Item'] ?? null;
+        if ($item === null) {
             return '';
         }
 
-        if (!is_array($item)) {
-            throw new \LogicException(sprintf('Expected an array, %s found', gettype($result["Item"])));
+        if (! is_array($item)) {
+            throw new LogicException(sprintf('Expected an array, %s found', gettype($result['Item'])));
         }
 
         $item = $this->marshaler->unmarshalItem($item);
-        if (!is_array($item)) {
-            throw new \LogicException(sprintf('Expected an array, %s found', gettype($result["Item"])));
+        if (! is_array($item)) {
+            throw new LogicException(sprintf('Expected an array, %s found', gettype($result['Item'])));
         }
 
         $value = $item['data'] ?? null;
 
-        if (!is_string($value)) {
-            throw new \RuntimeException('Data field value is expected to be a string');
+        if (! is_string($value)) {
+            throw new RuntimeException('Data field value is expected to be a string');
         }
 
         return $value;
@@ -85,13 +91,11 @@ class DynamoDbSessionHandler extends AbstractSessionHandler
 
     protected function doDestroy(string $sessionId): bool
     {
-        $key = $this->marshaler->marshalItem([
-            'id' => $sessionId
-        ]);
+        $key = $this->marshaler->marshalItem(['id' => $sessionId]);
 
         $this->dynamodb->deleteItem([
             'TableName' => $this->tableName,
-            'Key' => $key
+            'Key' => $key,
         ]);
 
         return true;

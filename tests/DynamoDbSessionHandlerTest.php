@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Pfazzi\Session\Tests\DynamoDb;
@@ -15,7 +16,7 @@ class DynamoDbSessionHandlerTest extends TestCase
     {
         $sdk = new Sdk([
             'region'   => 'eu-central-1',
-            'version'  => 'latest'
+            'version'  => 'latest',
         ]);
 
         $dynamodb = $sdk->createDynamoDb();
@@ -26,30 +27,30 @@ class DynamoDbSessionHandlerTest extends TestCase
         );
     }
 
-    public function test_close()
+    public function test_close(): void
     {
         self::assertTrue($this->instance->close());
     }
 
-    public function test_gc()
+    public function test_gc(): void
     {
         self::assertTrue($this->instance->gc(1));
     }
 
-    public function test_write_and_read()
+    public function test_write_and_read(): void
     {
         self::assertTrue($this->instance->write('test456', 'test'));
         self::assertEquals('test', $this->instance->read('test456'));
     }
 
-    public function test_rewrite_and_read()
+    public function test_rewrite_and_read(): void
     {
         self::assertTrue($this->instance->write('test456', 'test'));
         self::assertTrue($this->instance->write('test456', 'test test'));
         self::assertEquals('test test', $this->instance->read('test456'));
     }
 
-    public function test_destroy()
+    public function test_destroy(): void
     {
         $this->instance->write('test456', 'test');
         $this->instance->destroy('test456');
