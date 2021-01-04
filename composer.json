@@ -1,13 +1,7 @@
 {
     "name": "pfazzi/dynamo-db-session",
-    "description": "A DynamoDb adapter for session storage",
+    "description": "A DynamoDb adapter for Symfony session storage",
     "type": "library",
-    "require": {
-        "php": "^8",
-        "symfony/http-foundation": "^5.2",
-        "aws/aws-sdk-php": "^3.171",
-        "ext-json": "*"
-    },
     "license": "MIT",
     "authors": [
         {
@@ -25,7 +19,14 @@
             "Pfazzi\\Session\\Tests\\DynamoDb\\": "tests"
         }
     },
+    "require": {
+        "php": "^8",
+        "symfony/http-foundation": "^5.2",
+        "aws/aws-sdk-php": "^3.171",
+        "ext-json": "*"
+    },
     "require-dev": {
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^9.5",
+        "vimeo/psalm": "^4.3"
     }
 }

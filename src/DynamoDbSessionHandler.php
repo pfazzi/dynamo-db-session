@@ -26,6 +26,9 @@ class DynamoDbSessionHandler extends AbstractSessionHandler
         return true;
     }
 
+    /**
+     * @psalm-param int $maxlifetime
+     */
     public function gc($maxlifetime): bool
     {
         return true;
@@ -42,14 +45,27 @@ class DynamoDbSessionHandler extends AbstractSessionHandler
             'Key' => $key
         ]);
 
-        $item = $result["Item"];
+        $item = $result["Item"] ?? null;
         if (null === $item) {
             return '';
         }
 
-        $item = $this->marshaler->unmarshalItem($result["Item"]);
+        if (!is_array($item)) {
+            throw new \LogicException(sprintf('Expected an array, %s found', gettype($result["Item"])));
+        }
 
-        return $item['data'];
+        $item = $this->marshaler->unmarshalItem($item);
+        if (!is_array($item)) {
+            throw new \LogicException(sprintf('Expected an array, %s found', gettype($result["Item"])));
+        }
+
+        $value = $item['data'] ?? null;
+
+        if (!is_string($value)) {
+            throw new \RuntimeException('Data field value is expected to be a string');
+        }
+
+        return $value;
     }
 
     protected function doWrite(string $sessionId, string $data): bool
@@ -81,6 +97,10 @@ class DynamoDbSessionHandler extends AbstractSessionHandler
         return true;
     }
 
+    /**
+     * @psalm-param string $session_id The session id
+     * @psalm-param string $session_data
+     */
     public function updateTimestamp($session_id, $session_data): bool
     {
         return true;
