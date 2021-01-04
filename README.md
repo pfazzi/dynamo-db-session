@@ -20,6 +20,8 @@ services:
       arguments:
         $tableName: 'dashboard-session-dev' # TODO: change me!
 ```
+A DynamoDb table needs to exist in the configured region with the given `$tableName` option.
+The primary key of the table must be a String with key "id".
 
 Tell Symfony to use it as session handler in `config/packages/framework.yaml`:
 ```yaml
