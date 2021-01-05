@@ -6,25 +6,35 @@ namespace Pfazzi\Session\Tests\DynamoDb;
 
 use Aws\Sdk;
 use Pfazzi\Session\DynamoDb\DynamoDbSessionHandler;
+use Pfazzi\Session\DynamoDb\SessionTable;
 use PHPUnit\Framework\TestCase;
 
 class DynamoDbSessionHandlerTest extends TestCase
 {
     private DynamoDbSessionHandler $instance;
+    private SessionTable $sessionTable;
 
     protected function setUp(): void
     {
+        $tableName = 'session-handler-test';
+
         $sdk = new Sdk([
+            'endpoint' => 'http://localhost:8000',
             'region'   => 'eu-central-1',
             'version'  => 'latest',
         ]);
 
         $dynamodb = $sdk->createDynamoDb();
 
-        $this->instance = new DynamoDbSessionHandler(
-            $dynamodb,
-            'session-handler-test'
-        );
+        $this->sessionTable = new SessionTable($dynamodb, $tableName);
+        $this->sessionTable->create();
+
+        $this->instance = new DynamoDbSessionHandler($dynamodb, $tableName);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->sessionTable->delete();
     }
 
     public function test_close(): void
