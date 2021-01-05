@@ -30,6 +30,23 @@ framework:
         handler_id: pfazzi.dynamo_db_session
 ```
 
+### Create session table programmatically
+
+You can programmatically create the session table using `Pfazzi\Session\DynamoDb\SessionTable` class, as in the following example:
+```php
+$tableName = 'session-handler-test';
+
+$sdk = new Aws\Sdk([
+    'region'   => 'eu-central-1',
+    'version'  => 'latest',
+]);
+
+$dynamodb = $sdk->createDynamoDb();
+
+$this->sessionTable = new Pfazzi\Session\DynamoDb\SessionTable($dynamodb, $tableName);
+$this->sessionTable->create();
+```
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
