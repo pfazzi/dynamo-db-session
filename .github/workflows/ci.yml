@@ -3,32 +3,63 @@ name: Tests
 on:
   push:
     branches:
-      - master
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
 
   build:
     name: Build
     runs-on: ubuntu-latest
+    services:
+      dynamodb:
+        image: amazon/dynamodb-local
+        ports:
+          - 8000:8000
     strategy:
       max-parallel: 10
       matrix:
-        php: ['7.2', '7.3', '7.4', '8.0']
+        php: ['7.4', '8.0']
 
     steps:
       - name: Set up PHP
-        uses: shivammathur/setup-php@2.7.0
+        uses: shivammathur/setup-php@2.9.0
         with:
           php-version: ${{ matrix.php }}
+          tools: composer:v2, psalm, phpcs, cs2pr
           coverage: none
+        env:
+          update: true
 
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
 
       - name: Download dependencies
         run: |
           composer config minimum-stability dev
           composer update --no-interaction --prefer-dist --optimize-autoloader --prefer-stable
 
+      - name: Run phpcs
+        run: ./vendor/bin/phpcs --report=checkstyle -q src | cs2pr
+
+      - name: Run Psalm
+        run: psalm --output-format=github
+
+      - name: Setup problem matchers for PHPUnit
+        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
       - name: Run tests
-        run: ./vendor/bin/phpunit
+        run: ./vendor/bin/phpunit tests

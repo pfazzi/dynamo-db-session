@@ -22,6 +22,10 @@ class DynamoDbSessionHandlerTest extends TestCase
             'endpoint' => 'http://localhost:8000',
             'region'   => 'eu-central-1',
             'version'  => 'latest',
+            'credentials' => [
+                'key'    => 'my-access-key-id',
+                'secret' => 'my-secret-access-key',
+            ],
         ]);
 
         $dynamodb = $sdk->createDynamoDb();
