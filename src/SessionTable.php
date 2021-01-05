@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Pfazzi\Session\DynamoDb;
@@ -12,7 +13,7 @@ class SessionTable
 
     public function __construct(DynamoDbClient $dynamodb, string $tableName)
     {
-        $this->dynamodb = $dynamodb;
+        $this->dynamodb  = $dynamodb;
         $this->tableName = $tableName;
     }
 
