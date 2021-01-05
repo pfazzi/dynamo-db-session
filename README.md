@@ -34,7 +34,7 @@ framework:
 
 You can programmatically create the session table using `Pfazzi\Session\DynamoDb\SessionTable` class, as in the following example:
 ```php
-$tableName = 'session-handler-test';
+$tableName = 'some-session-table-name';
 
 $sdk = new Aws\Sdk([
     'region'   => 'eu-central-1',
@@ -43,8 +43,8 @@ $sdk = new Aws\Sdk([
 
 $dynamodb = $sdk->createDynamoDb();
 
-$this->sessionTable = new Pfazzi\Session\DynamoDb\SessionTable($dynamodb, $tableName);
-$this->sessionTable->create();
+$sessionTable = new Pfazzi\Session\DynamoDb\SessionTable($dynamodb, $tableName);
+$sessionTable->create();
 ```
 
 ## Contributing
