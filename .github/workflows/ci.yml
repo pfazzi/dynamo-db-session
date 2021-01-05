@@ -29,5 +29,6 @@ jobs:
         run: |
           composer config minimum-stability dev
           composer update --no-interaction --prefer-dist --optimize-autoloader --prefer-stable
+
       - name: Run tests
         run: ./vendor/bin/phpunit
